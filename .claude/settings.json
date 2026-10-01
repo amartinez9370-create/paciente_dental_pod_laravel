@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan --version)",
+      "Bash(php artisan db:show)",
+      "Bash(php artisan migrate:status)",
+      "Bash(php artisan config:show *)",
+      "Bash(php artisan route:list *)",
+      "Bash(composer check-platform-reqs)"
+    ],
+    "ask": [
+      "Bash(php artisan migrate *)",
+      "Bash(php artisan db:seed *)",
+      "PowerShell(php artisan migrate *)",
+      "PowerShell(php artisan db:seed *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git merge *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Edit(./.env)",
+      "Bash(php artisan db:wipe *)",
+      "PowerShell(php artisan db:wipe *)",
+      "Bash(*mysql*)",
+      "PowerShell(*mysql*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}
