@@ -6,7 +6,7 @@ Laravel 13 port of a working Phase 1 system (hand-rolled PHP MVC) for a small de
 
 ## Environment
 - Windows, PowerShell. PHP 8.5.11, Laravel 13.34, MariaDB 10.4.32 from XAMPP.
-- Serve with `php artisan serve`. Apache is not used. Only MariaDB runs from XAMPP.
+- The project lives at `C:\dev\paciente_dental_pod_laravel`, outside XAMPP's `htdocs`. Serve with `php artisan serve`. Apache is not used for the app. Only MariaDB needs to run from XAMPP.
 - Database `dbPacienteDentalPodLaravel`, driver `mariadb`, user root with an empty password (local only).
 - No starter kit and no Filament. Livewire and Alpine are added at the views step, not yet. Static pages and layouts are plain Blade.
 
@@ -35,4 +35,4 @@ Laravel 13 port of a working Phase 1 system (hand-rolled PHP MVC) for a small de
 - Preserve Phase 1 column types, nullability, ENUMs, indexes and ON DELETE rules, except where `docs/decisions.md` section 2 says otherwise.
 - Use raw `DB::statement` for `CHECK` constraints.
 - Timezone is Asia/Manila. Currency is the peso: no decimals when whole, and "Free" for zero.
-- Keep Eloquent models thin: relationships, casts, scopes and small accessors. Business logic goes in service classes. Declare `$fillable` explicitly, and never make `role` or `is_active` mass-assignable.
+- Keep Eloquent models thin: relationships, casts, scopes and small accessors. Business logic goes in service classes. Declare mass-assignable fields explicitly with the `#[Fillable]` attribute, as the skeleton's `User` model does, and do not mix in a `$fillable` property. Never make `role` or `is_active` mass-assignable.

@@ -9,6 +9,8 @@ Reference copies of the Phase 1 files are in `docs/reference/` (`schema.sql`, `M
 - Laravel 13, PHP 8.3 to 8.5 supported (local is 8.5.11), MariaDB 10.4.32, Livewire and Alpine later, plain Blade for static pages, layouts and the print report. No Filament, no starter kit.
 - The admin panel is fully hand-built Livewire. Interactive screens (request wizard, admin tables, walk-in flow, dependents) are Livewire. Email templates are Blade mailables. Small UI touches are Alpine.
 - The local database is `dbPacienteDentalPodLaravel`. Phase 1's `dbpacientedentalpod` must survive for parity testing.
+- The app connects as `root` with an empty password (local only). A dedicated database user was considered and declined. Root can reach every schema on this server, so the database safety rules in `CLAUDE.md` are the main protection. The Phase 1 database was backed up (a copy of the server data folder and an `.sql` export) before B1.
+- The project folder is `C:\dev\paciente_dental_pod_laravel`, outside XAMPP's `htdocs`, so Apache can run for phpMyAdmin without exposing the project. The app is served with `php artisan serve`, not Apache.
 
 ## 2. Database and migrations (Batch B1)
 
@@ -20,6 +22,7 @@ Reference copies of the Phase 1 files are in `docs/reference/` (`schema.sql`, `M
 - `CHECK` constraints are kept, using raw statements.
 - Skeleton migrations: replace the skeleton `users` migration. It also creates `password_reset_tokens` and `sessions`: drop the first, and keep `sessions` as its own migration. Keep the skeleton `cache` and `jobs` migrations. Keep the custom `password_resets` table (`token_hash`, `expires_at`, `used_at`), because the walk-in claim flow needs it.
 - Phase 1 had no `remember_token` or `email_verified_at`. Decide whether to add them in the plan, with a reason.
+- The stock skeleton assumes a `users.name` column. Our `users` table has none, because names live on the profile tables. The skeleton's `User` model lists `name` as fillable. Check `UserFactory` and `DatabaseSeeder` as well, since the stock versions use `name` and create a test user. Replace all three in B1, or `migrate:fresh --seed` fails. Use the `#[Fillable]` attribute with only columns that exist, never `role` or `is_active`.
 - Seeders: always load reference data (clinic, clinic hours, services). Load demo accounts only outside production, hashed with `Hash::make`. Demo accounts are the four Phase 1 users plus one demo staff account. Dentist profiles, their schedules and their service links belong to the demo seeder, because production dentists are created in the admin UI. Keep the Phase 1 ids (users 1 to 4) and add the staff user after them.
 - Stale `schema.sql` comments to fix, not copy: the reference code is not deterministic (section 5), the slot lock is not at booking (section 4), and `staff` holds profiles for the admin and staff roles. Skip the trailing "snapshot 45 to 46" migration block. It is already folded into the base `services` table and seed.
 - Creation order for B1: `clinics`, `clinic_hours`, `users`, `patients` (self-referencing guardian FK), `dentists`, `staff`, `services`, `dentist_services`, `dentist_schedules`, `password_resets`. The `appointments` table is B2.

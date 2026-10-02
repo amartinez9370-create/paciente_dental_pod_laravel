@@ -1,58 +1,86 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Paciente Dental POD
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Appointment request and scheduling system for a small dental clinic in Makati, Philippines. Patients submit an appointment request, and the clinic (dentist, staff or admin) assigns the date, time and dentist. This repository is the Laravel 13 port of the Phase 1 system, which was written in plain PHP.
 
-## About Laravel
+## Status
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Porting Phase 1: database migrations and seeders, then models, routes and views. The electronic medical record (EMR) is planned after the port and is not part of this repository yet.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Layer | Choice |
+|---|---|
+| Framework | Laravel 13 (PHP 8.3 or newer; developed on 8.5) |
+| Database | MariaDB 10.4 (XAMPP) |
+| Views | Blade for static pages, layouts and print views. Livewire for interactive screens and Alpine for small UI touches (planned) |
+| Assets | Vite |
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.3 or newer with these extensions enabled: `bcmath`, `ctype`, `curl`, `dom`, `fileinfo`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `zip`. Tests also need `pdo_sqlite` and `sqlite3`.
+- Composer 2
+- Node.js and npm, for the asset build
+- MariaDB or MySQL running locally (XAMPP is fine)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Local setup
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+git clone <repository-url>
+cd paciente_dental_pod_laravel
+composer install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Copy `.env.example` to `.env` (in PowerShell: `Copy-Item .env.example .env`), then:
 
-## Contributing
+```
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Create an empty database named `dbPacienteDentalPodLaravel` with character set `utf8mb4` and collation `utf8mb4_unicode_ci`. The connection values in `.env.example` match a default XAMPP install, so adjust the username and password in `.env` only if yours differ.
 
-## Code of Conduct
+Once the migrations are in (batch B1), build the schema and load the seed data:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+php artisan migrate:fresh --seed
+```
 
-## Security Vulnerabilities
+When the views are in place, build the assets:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+npm install
+npm run build
+```
 
-## License
+Start the app:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+php artisan serve
+```
+
+It runs at http://localhost:8000.
+
+**Notes**
+- Serve the app with `php artisan serve`. Only the `public/` folder should ever be reachable from a web server. If the project sits under XAMPP's `htdocs`, keep Apache stopped, because it would expose `.env` and `vendor/`.
+- Demo accounts are seeded only outside production, with fake data. Do not enter real patient data into a development database.
+
+## Tests
+
+```
+php artisan test
+```
+
+The default tests run against in-memory SQLite. Tests for row locking will need MariaDB and will be added with the booking logic.
+
+## Repository guide
+
+- `docs/decisions.md` records the locked design decisions and conventions.
+- `docs/reference/` holds the Phase 1 database schema and migration brief that the port is built from.
+- Everything else follows the standard Laravel layout.
+
+## Working method
+
+- One branch per batch of work, named `batch/<chat>-<id>-<slug>`, for example `batch/2.17-b1-migrations`.
+- Each branch is squash-merged into `main`, so `main` has one commit per batch. `main` should always pass `php artisan migrate:fresh --seed` once migrations exist.
+- One tag per batch, for example `2.17-A`.
+- Commit messages use `type(scope): summary`. The body says why the change was made and cites the decision it follows.
+- Never commit `.env`, database dumps, real patient data or images.
