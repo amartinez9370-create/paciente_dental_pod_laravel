@@ -97,5 +97,5 @@ Patients do not choose their own time. A patient submits an appointment request.
 4. Foreign key actions are preserved (for example `patients.guardian_patient_id` is RESTRICT and `dentists.user_id` is CASCADE).
 5. Each `CHECK` constraint rejects a bad row. Show the attempt and the error.
 6. `users.role` includes `staff` and the column is named `password`.
-7. Demo accounts load only when not in production. Passwords are hashed with `Hash::make`.
+7. Demo accounts load only in local and testing. Passwords are hashed with `Hash::make`.
 8. No `appointments` table and no EMR tables exist.
