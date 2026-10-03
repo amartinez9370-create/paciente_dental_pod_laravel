@@ -79,6 +79,9 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // Asia/Manila has no DST, so a fixed UTC+8 offset is unambiguous
+            // and never needs a tzdata table (see CLAUDE.md "Timezone").
+            'timezone' => '+08:00',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
